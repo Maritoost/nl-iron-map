@@ -52,13 +52,13 @@ button{touch-action:manipulation}
 .mobile-controls-toggle{display:none;width:100%;min-height:46px;margin-top:13px;border:1px solid #b8c9ce;background:#f4f9fb;border-radius:8px;font-weight:700;text-align:left;padding:9px 11px}
 
 .mappanel{position:relative;min-width:0;background:var(--map);overflow:hidden;isolation:isolate}
-.sat-base{position:absolute;z-index:0;max-width:none;pointer-events:none;display:none;filter:saturate(.80) contrast(.96) brightness(.95)}
+.sat-base{display:none!important}
 .mappanel.satellite .sat-base{display:block}
 .tiles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;display:none}
 .mappanel.satellite .tiles{display:block}
-.tiles img{position:absolute;max-width:none;mix-blend-mode:multiply;opacity:.66;filter:saturate(.78) contrast(.96) brightness(1.03)}
+.tiles img{position:absolute;max-width:none;opacity:.58;filter:saturate(.78) contrast(.97) brightness(.98)}
 .mapcanvas{position:absolute;inset:0;z-index:2;width:100%;height:100%;cursor:grab;touch-action:none}.mapcanvas:active{cursor:grabbing}
-.toolbar{position:absolute;z-index:5;top:14px;left:14px;right:14px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.toolbar{position:absolute;z-index:5;top:14px;left:14px;right:14px;display:flex;align-items:flex-start;justify-content:flex-end;pointer-events:none}
 .map-title,.basemap-control,.map-actions>button,.zoom-controls{background:#fbfcf9e9;border:1px solid #d2dedbe6;border-radius:8px;box-shadow:0 5px 20px #1e3a3d14;backdrop-filter:blur(8px)}
 .map-title{padding:9px 12px;font-size:13px;pointer-events:none}
 .map-actions{display:flex;gap:7px;align-items:center;pointer-events:auto}
@@ -82,6 +82,10 @@ button{touch-action:manipulation}
 .details section{border-top:1px solid var(--line);margin-top:23px;padding-top:20px}.details section header{display:flex;justify-content:space-between;align-items:center}.details section header small{color:var(--blue);font-size:11px}
 .chart{width:100%;height:auto;margin-top:10px;display:block;overflow:visible}.chart .grid{stroke:#dce4e2;stroke-width:1}.chart .line{fill:none;stroke:#b95b39;stroke-width:2}.chart .pred{fill:#cb6844}.chart .lab{fill:#fff;stroke:#0077b3;stroke-width:2}.chart text{fill:#708386;font:10px var(--mono)}
 .chartkey{display:flex;gap:14px;margin-top:7px;font-size:11px;color:var(--muted)}.chartkey span{display:flex;align-items:center;gap:5px}.chartkey i{display:inline-block;width:14px;height:2px;background:#b95b39}.chartkey span+span i{width:8px;height:8px;border:2px solid #0077b3;border-radius:50%;background:#fff}
+.chart-status{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.chart-status .est{color:#b95b39;font-weight:700}
+.chart-status .lab{color:#0077b3;font-weight:700}
+.chart-status .sep{color:var(--muted)}
 .kv{margin-top:8px}.kv div{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;padding:8px 0;border-bottom:1px solid #e3e8e6;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-weight:650}
 .empty{margin-top:11px;border:1px dashed #cad6d3;border-radius:8px;padding:28px 10px;text-align:center;color:var(--muted);font-size:13px}
 .science-note{margin-top:17px;padding:13px 14px;background:#eef7fb;border-left:4px solid var(--blue);border-radius:0 8px 8px 0;color:#294950;font-size:13px;line-height:1.5}
@@ -104,7 +108,6 @@ button{touch-action:manipulation}
     <aside class="controls" id="controls">
       <div class="brand"><b>VU</b><span>EO4WQ-NL</span></div>
       <div class="title">
-        <p class="eyebrow">Empirical Sentinel-2 estimates · 2015–2025</p>
         <h1>Estimated total iron in Dutch inland waters</h1>
         <p>Explore spatial and seasonal patterns in estimated total Fe across eligible WFD freshwater segments.</p>
       </div>
@@ -152,7 +155,6 @@ button{touch-action:manipulation}
       <canvas class="mapcanvas" id="mapCanvas" tabindex="0" aria-label="Interactive map of estimated total iron in Dutch inland waters"></canvas>
 
       <div class="toolbar">
-        <div class="map-title"><b id="mapLayerTitle">Long-term median</b> · predicted total Fe</div>
         <div class="map-actions">
           <div class="basemap-control"><span>Background</span><div class="basemap-buttons"><button id="plainBtn" class="active">Plain</button><button id="satBtn">Satellite</button></div></div>
           <div class="zoom-controls"><button id="zoomIn">+</button><button id="zoomOut">−</button></div>
@@ -162,8 +164,7 @@ button{touch-action:manipulation}
 
       <div class="stats"><div><b>1.68</b><span>median mg L⁻¹</span></div><div><b>3.34</b><span>P90 reference</span></div><div><b>129</b><span>median dates</span></div></div>
       <div class="scale"><div class="bar" id="scaleBar"></div><span id="scaleLabel">20 km</span></div>
-      <div class="hint"><b>Scroll</b> to zoom · <b>drag</b> to pan · <b>select</b> for details</div>
-      <div class="attribution">Satellite: EOX Sentinel-2 Cloudless · aerial detail: PDOK / Beeldmateriaal</div>
+      <div class="attribution">Aerial imagery: PDOK / Beeldmateriaal · CC BY 4.0</div>
       <div class="load-status" id="loadStatus"></div>
     </main>
 
@@ -218,7 +219,12 @@ function colour(layer,value){
   const a=rgb(d.palette[i]),b=rgb(d.palette[j]); return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`
 }
 function filtered(s){
-  if(state.soil!=="All"){const x=(s.m.soil_final||s.m.primary_soil||"").toLowerCase();if(!x.includes(state.soil.toLowerCase()))return false}
+  if(state.soil!=="All"){
+    const aliases={Peat:"veen",Sand:"zand",Clay:"klei"};
+    const wanted=(aliases[state.soil]||state.soil).toLowerCase();
+    const x=(s.m.soil_final||s.m.primary_soil||"").toLowerCase();
+    if(!x.includes(wanted))return false;
+  }
   return true
 }
 function resize(){
@@ -299,7 +305,7 @@ function usePolygons(){
 }
 function draw(){
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
-  const vb=visibleBBox(),polyMode=usePolygons(),alpha=state.satellite?.78:.94;
+  const vb=visibleBBox(),polyMode=usePolygons(),alpha=1;
 
   if(!polyMode){
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalAlpha=alpha;
@@ -359,7 +365,7 @@ async function renderDetails(s){
   <div class="tags"><span>${escapeHtml(m.krw||"WFD type unknown")}</span><span>${escapeHtml(soil)}</span>${m.has_in_situ?'<span class="insitu">In situ coverage</span>':""}</div>
   <div class="hero"><span>Long-term median estimated total Fe</span><b>${fmt(m.fe_mean_median,2)} <small>mg L⁻¹</small></b><small>September–May</small></div>
   <div class="metrics"><div class="metric"><span>Winter</span><b>${fmt(m.season_DJF_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Spring</span><b>${fmt(m.season_MAM_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Autumn</span><b>${fmt(m.season_SON_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Hotspot frequency</span><b>${fmt(m.hotspot_frequency_pct_4c,1)}%</b><small>P90 = 3.34 mg L⁻¹</small></div></div>
-  <section><header><h3>Time series</h3><small id="chartStatus">Loading…</small></header><div id="chartWrap" class="empty">Loading segment time series…</div></section>
+  <section><header><h3>Time series</h3><small id="chartStatus" class="chart-status">Loading…</small></header><div id="chartWrap" class="empty">Loading segment time series…</div></section>
   <section><header><h3>Segment context</h3></header><dl class="kv"><div><dt>WFD type</dt><dd>${escapeHtml(m.krw||"—")}</dd></div><div><dt>Median width</dt><dd>${fmt(m.width_medi,1)} m</dd></div><div><dt>Maximum width</dt><dd>${fmt(m.width_max,1)} m</dd></div><div><dt>Soil association</dt><dd>${escapeHtml(soil)}</dd></div><div><dt>Median valid pixels</dt><dd>${fmt(m.valid_count_median,0)}</dd></div></dl></section>`;
   loadChart(s.id)
 }
@@ -367,7 +373,12 @@ function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;",
 async function loadChart(id){
   const shard=String(id%64).padStart(2,"0");let pred=[],lab=[];
   try{const [a,b]=await Promise.all([fetch(`./data/timelines/${shard}.json`).then(r=>r.json()),fetch(`./data/lab/${shard}.json`).then(r=>r.json())]);pred=a[String(id)]||[];lab=b[String(id)]||[]}catch(e){console.error(e)}
-  const wrap=$("#chartWrap"),status=$("#chartStatus");if(!wrap)return;if(status)status.textContent=pred.length?`${pred.length} estimated dates`:"";
+  const wrap=$("#chartWrap"),status=$("#chartStatus");if(!wrap)return;
+  if(status){
+    const est=`<span class="est">${pred.length} estimated date${pred.length===1?"":"s"}</span>`;
+    const ins=lab.length?`<span class="sep">·</span><span class="lab">${lab.length} in situ observation${lab.length===1?"":"s"}</span>`:"";
+    status.innerHTML=est+ins;
+  }
   if(!pred.length&&!lab.length){wrap.className="empty";wrap.textContent="No time-series data available for this segment.";return}
   wrap.className="";wrap.innerHTML=chartSVG(pred,lab)
 }
@@ -378,10 +389,13 @@ function chartSVG(pred,lab){
   if(pred.length){let pts=pred.map(d=>`${x(d[0]).toFixed(1)},${y(d[1]).toFixed(1)}`).join(" ");s+=`<polyline class="line" points="${pts}"/>`;for(const d of pred)s+=`<circle class="pred" cx="${x(d[0])}" cy="${y(d[1])}" r="2"/>`}
   for(const d of lab)s+=`<circle class="lab" cx="${x(d[0])}" cy="${y(d[1])}" r="3.5"/>`;
   const epoch=new Date(Date.UTC(2015,0,1));for(let yr=2016;yr<=2025;yr+=3){let day=(Date.UTC(yr,0,1)-epoch.getTime())/86400000;if(day>=xmin&&day<=xmax)s+=`<text x="${x(day)}" y="${H-8}" text-anchor="middle">${yr}</text>`}
-  s+=`</svg><div class="chartkey"><span><i></i>Estimated total Fe</span><span><i></i>In situ Fe</span></div>`;return s
+  let key=`<div class="chartkey"><span><i></i>Estimated total Fe</span>`;
+  if(lab.length)key+=`<span><i></i>In situ Fe</span>`;
+  key+=`</div>`;
+  s+=`</svg>${key}`;return s
 }
 function updateLegend(){
-  const d=LAYERS[state.layer];$("#legendName").textContent=d.name;$("#legendUnit").textContent=d.unit;$("#mapLayerTitle").textContent=d.name;
+  const d=LAYERS[state.layer];$("#legendName").textContent=d.name;$("#legendUnit").textContent=d.unit;
   $("#legendBar").style.background=`linear-gradient(90deg,${d.palette.join(",")})`;$("#legendTicks").innerHTML=d.ticks.map(t=>`<span>${t}</span>`).join("")
 }
 function updateScale(){
@@ -393,7 +407,7 @@ function tileBounds(z,x,y){const n=2**z,s=2*WORLD/n;return [-WORLD+x*s,WORLD-(y+
 let tileCache=new Map();
 function updateTiles(){
   if(!state.satellite){tileLayer.innerHTML="";return}
-  const z=zoomLevel();if(z<10){tileLayer.innerHTML="";return}
+  const z=Math.max(8,zoomLevel());
   const vb=visibleBBox(),n=2**z,s=2*WORLD/n;
   let x0=Math.max(0,Math.floor((vb[0]+WORLD)/s)-1),x1=Math.min(n-1,Math.floor((vb[2]+WORLD)/s)+1);
   let y0=Math.max(0,Math.floor((WORLD-vb[3])/s)-1),y1=Math.min(n-1,Math.floor((WORLD-vb[1])/s)+1);
@@ -408,17 +422,12 @@ function updateTiles(){
   if(tileCache.size>120){for(const [k,img] of tileCache){if(!needed.has(k)){tileCache.delete(k);if(img.parentNode)img.remove();if(tileCache.size<=90)break}}}
 }
 let baseBounds=null,baseSeq=0,baseTimer=0;
-function scheduleRaster(){clearTimeout(baseTimer);baseTimer=setTimeout(loadBase,180)}
-function loadBase(){
-  if(!state.satellite)return;const vb=visibleBBox(),seq=++baseSeq;const maxDim=900,ratio=cssW/cssH;let w,h;if(ratio>=1){w=maxDim;h=Math.round(maxDim/ratio)}else{h=maxDim;w=Math.round(maxDim*ratio)}
-  const q=new URLSearchParams({SERVICE:"WMS",VERSION:"1.1.1",REQUEST:"GetMap",LAYERS:"s2cloudless",STYLES:"",FORMAT:"image/jpeg",SRS:"EPSG:3857",WIDTH:String(w),HEIGHT:String(h),BBOX:vb.join(",")});
-  const img=new Image();img.alt="";img.decoding="async";showStatus("Loading satellite background…");img.onload=()=>{if(seq!==baseSeq||!state.satellite)return;satBase.src=img.src;baseBounds=vb.slice();updateRasterPositions();showStatus("")};img.onerror=()=>{if(seq===baseSeq)showStatus("Satellite background temporarily unavailable")};img.src="https://tiles.maps.eox.at/map?"+q.toString()
-}
+function scheduleRaster(){if(state.satellite)updateTiles()}
+function loadBase(){return}
 function updateRasterPositions(){
-  if(baseBounds&&state.satellite){satBase.style.left=sx(baseBounds[0])+"px";satBase.style.top=sy(baseBounds[3])+"px";satBase.style.width=(baseBounds[2]-baseBounds[0])/view.upp+"px";satBase.style.height=(baseBounds[3]-baseBounds[1])/view.upp+"px"}
   updateTiles()
 }
-function setSatellite(v){state.satellite=v;panel.classList.toggle("satellite",v);$("#plainBtn").classList.toggle("active",!v);$("#satBtn").classList.toggle("active",v);if(v){scheduleRaster();updateTiles()}else{++baseSeq;showStatus("");tileLayer.innerHTML=""}requestDraw()}
+function setSatellite(v){state.satellite=v;panel.classList.toggle("satellite",v);$("#plainBtn").classList.toggle("active",!v);$("#satBtn").classList.toggle("active",v);if(v){showStatus("");updateTiles()}else{showStatus("");tileLayer.innerHTML=""}requestDraw()}
 function showTooltip(i,e){
   if(i<0){tooltip.hidden=true;return}const s=state.segments[i],m=s.m;tooltip.innerHTML=`<b>${escapeHtml(m.display_name||m.naamnl||m.naamoffici||("Segment "+s.id))}</b><span>${escapeHtml(m.krw||"")} · ${escapeHtml(m.soil_final||m.primary_soil||"")}</span><strong>${fmt(m[LAYERS[state.layer].key],state.layer==="hotspot"?1:2)} ${LAYERS[state.layer].unit}</strong>`;tooltip.hidden=false;tooltip.style.left=Math.min(innerWidth-245,e.clientX+14)+"px";tooltip.style.top=Math.min(innerHeight-95,e.clientY+14)+"px"
 }
@@ -523,10 +532,23 @@ document.addEventListener("click",e=>{if(!e.target.closest(".search"))res.hidden
 $("#aboutBtn").onclick=()=>openAbout();
 function openAbout(){
   const d=document.createElement("div");d.className="modal-backdrop";d.innerHTML=`<div class="modal"><button class="close" aria-label="Close">×</button><p class="eyebrow">About this product</p><h2>Estimated total iron in Dutch inland waters</h2>
-  <div class="science-note"><b>How to interpret this product</b><br>Total Fe includes multiple dissolved, colloidal and particulate iron forms. Sentinel-2 does not measure iron directly. The map shows empirical estimates based on Sentinel-2 reflectance and environmental context.</div>
-  <p>The mapped product covers 7,820 eligible Dutch inland WFD segments and 1,066,757 segment-date estimates across 657 Sentinel-2 acquisition dates. Mapping is restricted to September–May.</p>
-  <h3>Model robustness</h3><ul><li>Location-grouped evaluation: R² ≈ 0.68, RMSE ≈ 0.66 mg L⁻¹.</li><li>Spatial-block evaluation: R² ≈ 0.57.</li><li>Highest Fe concentrations are generally underestimated.</li></ul>
-  <h3>Background imagery</h3><p>The optional Satellite background uses EOX Sentinel-2 Cloudless as a seamless base and PDOK aerial imagery for local detail. The Fe polygons are drawn from the original geographic WFD geometries.</p>
+  <div class="science-note"><b>How to interpret this product</b><br>Sentinel-2 does not measure iron directly. The map shows empirical estimates of total Fe based on Sentinel-2 reflectance and environmental context.</div>
+  <h3>Study domain</h3>
+  <p>Eligible non-tidal freshwater KRW water body segments in the Netherlands, September–May, 2015–2025.</p>
+  <p><b>775 satellite–field matchups · 151 monitoring locations · XGBoost regression · Nested 5-fold cross-validation grouped by monitoring location</b></p>
+  <h3>Model inputs</h3>
+  <p><b>Context:</b> water-body width, seven-day precipitation, time of year and relative elevation</p>
+  <p><b>Spectral:</b> green–red absorption/attenuation descriptors, visible-to-SWIR spectral shape, NIR–SWIR contrast and B6 red-edge reflectance</p>
+  <h3>Transferability</h3>
+  <ul>
+    <li><b>New locations:</b> R² 0.68, MAE 0.43 mg L⁻¹</li>
+    <li><b>New 25 × 25 km areas:</b> R² 0.57, MAE 0.49 mg L⁻¹</li>
+    <li><b>Later years, 2021–2025:</b> R² 0.68, MAE 0.41 mg L⁻¹</li>
+  </ul>
+  <h3>Mapped product</h3>
+  <p>7,820 eligible WFD segments · 1,066,757 segment-date estimates · 657 Sentinel-2 acquisition dates. Hotspot frequency is the percentage of accepted dates above the national P90 of estimated total Fe (3.34 mg L⁻¹).</p>
+  <p><b>Background:</b> optional PDOK aerial imagery. The Fe layer uses the original geographic WFD segment geometries.</p>
+  <p><b>Ocean Optics XXVII · Poster #234</b></p>
   <p><b>Contact:</b> <a href="mailto:m.van.oostende@vu.nl">m.van.oostende@vu.nl</a></p></div>`;document.body.appendChild(d);d.querySelector(".close").onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove()}
 }
 
