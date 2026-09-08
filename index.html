@@ -195,8 +195,8 @@ let state={
   coarse:null,coarsePaths:null,coarseReady:false,coarseLoading:false,
   detail:null,detailPaths:new Map(),detailLoading:false
 };
-let view={cx:0,cy:0,upp:500}, cssW=1,cssH=1,dpr=1,drag=null,pointers=new Map(),pinch=null,redrawRAF=0;
-const WORLD=20037508.342789244, MOBILE_POLY_UPP=90, DETAIL_UPP=28;
+let view={cx:0,cy:0,upp:500,drag:null,pointers:new Map(),pinch:null}, cssW=1,cssH=1,dpr=1,redrawRAF=0;
+const WORLD=20037508.342789244, DESKTOP_POLY_UPP=180, MOBILE_POLY_UPP=120, DETAIL_UPP=28;
 
 function decodeMeta(d){
   return d.segments.map(a=>({
@@ -230,6 +230,10 @@ function sx(x){return (x-view.cx)/view.upp+cssW/2}
 function sy(y){return (view.cy-y)/view.upp+cssH/2}
 function wx(x){return view.cx+(x-cssW/2)*view.upp}
 function wy(y){return view.cy-(y-cssH/2)*view.upp}
+function eventPoint(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:e.clientX-r.left,y:e.clientY-r.top};
+}
 function visibleBBox(){return [wx(0),wy(cssH),wx(cssW),wy(0)]}
 function fitBounds(b,pad=1.08){
   const w=(b[2]-b[0])*pad,h=(b[3]-b[1])*pad;view.cx=(b[0]+b[2])/2;view.cy=(b[1]+b[3])/2;view.upp=Math.max(w/cssW,h/cssH);
@@ -265,7 +269,8 @@ function buildCoarsePaths(){
 }
 function maybeLoadCoarse(){
   if(state.coarseLoading||state.coarse||!state.segments.length)return;
-  if(window.innerWidth<=930&&view.upp>MOBILE_POLY_UPP&&state.selected==null)return;
+  const threshold=window.innerWidth<=930?MOBILE_POLY_UPP:DESKTOP_POLY_UPP;
+  if(view.upp>threshold*1.35&&state.selected==null)return;
   state.coarseLoading=true;
   fetch("./data/segments-coarse-delta.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
     .then(g=>{state.coarse=g;buildCoarsePaths()}).catch(console.error).finally(()=>state.coarseLoading=false)
@@ -288,14 +293,17 @@ function detailPath(i){
   }
   return p
 }
-function usePolygons(){return state.coarseReady && !(window.innerWidth<=930&&view.upp>MOBILE_POLY_UPP)}
+function usePolygons(){
+  const threshold=window.innerWidth<=930?MOBILE_POLY_UPP:DESKTOP_POLY_UPP;
+  return state.coarseReady && view.upp<=threshold;
+}
 function draw(){
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
   const vb=visibleBBox(),polyMode=usePolygons(),alpha=state.satellite?.78:.94;
 
   if(!polyMode){
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalAlpha=alpha;
-    const rad=Math.max(2.2,Math.min(5,3.2*Math.sqrt(350/Math.max(view.upp,60))));
+    const rad=Math.max(2.8,Math.min(5.2,3.7*Math.sqrt(420/Math.max(view.upp,70))));
     for(let i=0;i<state.segments.length;i++){
       const s=state.segments[i];if(!filtered(s)||s.cx<vb[0]||s.cx>vb[2]||s.cy<vb[1]||s.cy>vb[3])continue;
       ctx.beginPath();ctx.arc(sx(s.cx),sy(s.cy),rad,0,Math.PI*2);ctx.fillStyle=colour(state.layer,+s.m[LAYERS[state.layer].key]);ctx.fill();
@@ -309,7 +317,6 @@ function draw(){
       const s=state.segments[i];if(!filtered(s))continue;const b=s.b;if(b[2]<vb[0]||b[0]>vb[2]||b[3]<vb[1]||b[1]>vb[3])continue;
       const p=detailed?detailPath(i):state.coarsePaths[i];if(!p)continue;
       ctx.fillStyle=colour(state.layer,+s.m[LAYERS[state.layer].key]);ctx.fill(p,"evenodd");
-      ctx.strokeStyle=state.satellite?"rgba(255,255,255,.65)":"rgba(255,255,255,.82)";ctx.lineWidth=Math.max(.35,1.0)*view.upp;ctx.stroke(p);
       if(state.insitu&&s.m.has_in_situ){ctx.strokeStyle="#10292f";ctx.lineWidth=1.15*view.upp;ctx.stroke(p)}
     }
     if(state.selected!=null){
@@ -419,15 +426,91 @@ function search(q){
   q=q.trim().toLowerCase();if(!q)return[];const scored=[];for(let i=0;i<state.segments.length;i++){const s=state.segments[i],m=s.m,name=(m.display_name||"").toLowerCase(),krw=(m.krw||"").toLowerCase(),id=String(s.id);let sc=0;if(name===q)sc=100;else if(name.startsWith(q))sc=80;else if(name.includes(q))sc=60;else if(krw===q)sc=50;else if(id===q)sc=100;else if(id.includes(q))sc=30;if(sc)scored.push([sc,i])}return scored.sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1])
 }
 
-canvas.addEventListener("wheel",e=>{e.preventDefault();zoomAt(e.offsetX,e.offsetY,Math.exp(e.deltaY*.001))},{passive:false});
-canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);view.pointers.set(e.pointerId,{x:e.offsetX,y:e.offsetY});if(view.pointers.size===1)view.drag={x:e.offsetX,y:e.offsetY,cx:view.cx,cy:view.cy,moved:false};else if(view.pointers.size===2){const a=[...view.pointers.values()];view.pinch={dist:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),upp:view.upp,world:{x:wx((a[0].x+a[1].x)/2),y:wy((a[0].y+a[1].y)/2)}}}});
-canvas.addEventListener("pointermove",e=>{
-  if(view.pointers.has(e.pointerId)){view.pointers.set(e.pointerId,{x:e.offsetX,y:e.offsetY});if(view.pointers.size===1&&view.drag){const dx=e.offsetX-view.drag.x,dy=e.offsetY-view.drag.y;if(Math.abs(dx)+Math.abs(dy)>3)view.drag.moved=true;view.cx=view.drag.cx-dx*view.upp;view.cy=view.drag.cy+dy*view.upp;requestDraw();updateRasterPositions()}
-  else if(view.pointers.size===2&&view.pinch){const a=[...view.pointers.values()],dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),mid={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};view.upp=Math.max(.08,Math.min(5000,view.pinch.upp*view.pinch.dist/Math.max(1,dist)));view.cx=view.pinch.world.x-(mid.x-cssW/2)*view.upp;view.cy=view.pinch.world.y+(mid.y-cssH/2)*view.upp;requestDraw();updateRasterPositions();maybeLoadCoarse();maybeLoadDetail()}}
-  else{const i=hitTest(e.offsetX,e.offsetY);state.hover=i;showTooltip(i,e)}
+canvas.addEventListener("wheel",e=>{
+  e.preventDefault();
+  const p=eventPoint(e);
+  zoomAt(p.x,p.y,Math.exp(e.deltaY*.001));
+},{passive:false});
+
+canvas.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  const p=eventPoint(e);
+  try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+  view.pointers.set(e.pointerId,p);
+
+  if(view.pointers.size===1){
+    view.drag={x:p.x,y:p.y,cx:view.cx,cy:view.cy,moved:false};
+  }else if(view.pointers.size===2){
+    const a=[...view.pointers.values()];
+    const mx=(a[0].x+a[1].x)/2,my=(a[0].y+a[1].y)/2;
+    view.pinch={
+      dist:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),
+      upp:view.upp,
+      world:{x:wx(mx),y:wy(my)}
+    };
+    view.drag=null;
+  }
 });
-function pointerEnd(e){const wasDrag=view.drag?.moved;view.pointers.delete(e.pointerId);if(view.pointers.size<2)view.pinch=null;if(view.pointers.size===0){if(!wasDrag&&e.type==="pointerup"){const i=hitTest(e.offsetX,e.offsetY);if(i>=0)selectIndex(i,false)}view.drag=null;scheduleRaster();maybeLoadCoarse();maybeLoadDetail()}}
-canvas.addEventListener("pointerup",pointerEnd);canvas.addEventListener("pointercancel",pointerEnd);canvas.addEventListener("pointerleave",()=>{if(!view.pointers.size)tooltip.hidden=true});
+
+canvas.addEventListener("pointermove",e=>{
+  const p=eventPoint(e);
+
+  if(view.pointers.has(e.pointerId)){
+    e.preventDefault();
+    view.pointers.set(e.pointerId,p);
+
+    if(view.pointers.size===1&&view.drag){
+      const dx=p.x-view.drag.x,dy=p.y-view.drag.y;
+      if(Math.abs(dx)+Math.abs(dy)>4)view.drag.moved=true;
+      view.cx=view.drag.cx-dx*view.upp;
+      view.cy=view.drag.cy+dy*view.upp;
+      requestDraw();
+      updateRasterPositions();
+    }else if(view.pointers.size===2&&view.pinch){
+      const a=[...view.pointers.values()];
+      const dist=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+      const mx=(a[0].x+a[1].x)/2,my=(a[0].y+a[1].y)/2;
+      view.upp=Math.max(.08,Math.min(5000,view.pinch.upp*view.pinch.dist/Math.max(1,dist)));
+      view.cx=view.pinch.world.x-(mx-cssW/2)*view.upp;
+      view.cy=view.pinch.world.y+(my-cssH/2)*view.upp;
+      requestDraw();
+      updateRasterPositions();
+      maybeLoadCoarse();
+      maybeLoadDetail();
+    }
+  }else{
+    const i=hitTest(p.x,p.y);
+    state.hover=i;
+    showTooltip(i,e);
+  }
+});
+
+function pointerEnd(e){
+  const p=eventPoint(e);
+  const wasDrag=!!view.drag?.moved;
+  const wasSingle=view.pointers.size===1;
+
+  view.pointers.delete(e.pointerId);
+  if(view.pointers.size<2)view.pinch=null;
+
+  if(view.pointers.size===0){
+    if(!wasDrag&&wasSingle&&e.type==="pointerup"){
+      const i=hitTest(p.x,p.y);
+      if(i>=0)selectIndex(i,false);
+    }
+    view.drag=null;
+    scheduleRaster();
+    maybeLoadCoarse();
+    maybeLoadDetail();
+  }else if(view.pointers.size===1){
+    const remaining=[...view.pointers.values()][0];
+    view.drag={x:remaining.x,y:remaining.y,cx:view.cx,cy:view.cy,moved:true};
+  }
+}
+canvas.addEventListener("pointerup",pointerEnd);
+canvas.addEventListener("pointercancel",pointerEnd);
+canvas.addEventListener("pointerleave",e=>{if(!view.pointers.size)tooltip.hidden=true});
+canvas.addEventListener("contextmenu",e=>e.preventDefault());
 
 $("#zoomIn").onclick=()=>zoomAt(cssW/2,cssH/2,.65);$("#zoomOut").onclick=()=>zoomAt(cssW/2,cssH/2,1.55);$("#resetBtn").onclick=()=>fitBounds(state.bounds);$("#plainBtn").onclick=()=>setSatellite(false);$("#satBtn").onclick=()=>setSatellite(true);
 $("#layers").onclick=e=>{const b=e.target.closest("button[data-layer]");if(!b)return;state.layer=b.dataset.layer;$$("#layers button").forEach(x=>x.classList.toggle("active",x===b));updateLegend();requestDraw()};
@@ -450,7 +533,7 @@ function openAbout(){
 fetch("./data/segments-fast.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{
   state.segments=decodeMeta(d);state.bounds=d.bounds;renderInitial();updateLegend();resize();fitBounds(state.bounds);
   const n=state.segments.filter(s=>s.m.has_in_situ).length;$("#insituCount").textContent=`Off · ${n} segments`;
-  if(window.innerWidth>930)setTimeout(maybeLoadCoarse,30);
+  setTimeout(maybeLoadCoarse,30);
 }).catch(e=>{console.error(e);details.innerHTML=`<div class="empty">Map data could not be loaded. Please refresh the page.</div>`});
 
 addEventListener("resize",resize);
