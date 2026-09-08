@@ -1,32 +1,23 @@
-# EO4WQ-NL Interactive Iron Map — GitHub Pages files
+EO4WQ-NL responsive GitHub Pages build
 
-This folder is ready to publish with GitHub Pages.
+This build has been optimized separately for desktop and mobile without changing
+the public URL.
 
-## Recommended repository name
-`eo4wq-nl-iron-map`
+Desktop:
+- full water-segment polygon geometry;
+- existing desktop map behaviour retained.
 
-## Files
-- `index.html` — website entry page
-- `.nojekyll` — tells GitHub Pages to serve the site as plain static files
-- `data/segments.json` — map geometry and segment metadata
-- `data/timelines/` — timeline data loaded only when needed
-- `data/lab/` — in-situ/lab data loaded only when needed
+Mobile/touch:
+- lightweight point representation of all 7,820 segments;
+- no thousands of Path2D polygons;
+- no heavy country-outline Path2D;
+- precomputed layer colours for fast layer switching;
+- lower-resolution canvas;
+- search, filters, zoom buttons and details remain available.
 
-## Publish
-1. Create a GitHub repository, preferably named `eo4wq-nl-iron-map`.
-2. Make it Public if you use GitHub Free.
-3. Add the complete contents of this folder to the repository.
-4. In the repository go to: Settings → Pages.
-5. Under Build and deployment choose:
-   - Source: Deploy from a branch
-   - Branch: main
-   - Folder: / (root)
-6. Save.
+Timeline and lab observations are still loaded on demand.
 
-The default website will then be:
-`https://YOUR-GITHUB-USERNAME.github.io/eo4wq-nl-iron-map/`
-
-Use the final published URL for the QR code.
-
-## Updating later
-Replace the relevant files, commit and push again. GitHub Pages will republish the site.
+To publish:
+1. Replace the current repository contents with the contents of this folder.
+2. GitHub Desktop: Commit to main.
+3. Push origin.
