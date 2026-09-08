@@ -1,31 +1,27 @@
-# EO4WQ-NL geographic map build
+# EO4WQ-NL geographic FAST build
 
-This version replaces the earlier flattened 0–1000 canvas geometry with the
-original 7,820 WFD polygon geometries.
+This is a performance-optimised version of the geographically correct map.
 
-Core map CRS
-- EPSG:3857 (Web Mercator) in the browser.
-- Source geometries were extracted from `krw.shp` using the website's stored
-  `source_row_index` and reprojected from EPSG:32631.
-- The polygons and external imagery therefore share the same geographic map
-  coordinates.
+What changed
+- Initial segment metadata reduced from ~6.2 MB to ~1.6 MB by compact encoding.
+- The first screen does not block on detailed geometry.
+- Desktop shows points immediately, then swaps to true 50 m-simplified polygons
+  once a ~0.6 MB coarse geometry file has loaded.
+- Mobile remains point-first and loads polygons only after local zoom/selection.
+- Detailed 5 m true geometry is delta-encoded (~1.5 MB) and fetched only at close
+  zoom or after selecting a segment.
+- Canvas polygon paths are built once and cached as Path2D objects.
+- Drawing uses a geographic world-to-screen canvas transform, instead of
+  reconstructing every polygon in screen coordinates on every frame.
+- Only visible segments are drawn.
+- Satellite imagery still loads only when Satellite is selected.
 
-Background
-- Plain: no external imagery requests.
-- Satellite:
-  - EOX Sentinel-2 Cloudless WMS is the seamless base.
-  - PDOK current 25 cm RGB aerial WMTS tiles provide local high-resolution detail.
-  - PDOK tiles are blended over the satellite base.
-
-Performance
-- Metadata/points load first.
-- Simplified true polygon geometry (~5 m simplification) is a separate file.
-- Desktop loads polygon geometry immediately.
-- Mobile starts with points and loads polygons at local zoom or after selection.
-- Timeline/lab shards are loaded only after segment selection.
+Geographic alignment is unchanged
+- True 7,820 WFD geometries.
+- Browser map: EPSG:3857.
+- No guessed canvas-to-map transform.
 
 Publish
-1. Replace the contents of the local `nl-iron-map` repository with this folder.
+1. Replace the contents of your local `nl-iron-map` repository with this folder.
 2. Commit to main.
 3. Push origin.
-4. GitHub Pages remains configured from `main` / root.
