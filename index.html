@@ -240,12 +240,17 @@ react/cjs/react-jsx-runtime.production.js:
 <script id="pdok-aerial-manager">
 (function(){
   'use strict';
-  // Native map georeferencing: Amersfoort / RD New (EPSG:28992)
-  var RD_X0=2000, RD_Y0=629000, RD_M_PER_UNIT=280;
+  // Native map georeferencing.
+  // Source TOP10NL/KRW geometry: WGS84 / UTM zone 31N (EPSG:32631).
+  // The custom canvas uses exactly 280 metres per map unit.
+  // PDOK aerial WMS is requested in ETRS89 / UTM zone 31N (EPSG:25831);
+  // over the Netherlands this is effectively coincident with EPSG:32631
+  // at the scale of this web map.
+  var UTM_X0=510000, UTM_Y_TOP=5948400, MAP_M_PER_UNIT=280;
   var active=false, lastView=null, currentBounds=null, timer=null, requestSeq=0;
   var panel=null, layer=null, image=null, status=null, plainBtn=null, aerialBtn=null;
-  function rdX(x){return RD_X0+x*RD_M_PER_UNIT}
-  function rdY(y){return RD_Y0-y*RD_M_PER_UNIT}
+  function utmX(x){return UTM_X0+x*MAP_M_PER_UNIT}
+  function utmY(y){return UTM_Y_TOP-y*MAP_M_PER_UNIT}
   function setStatus(msg){if(!status)return;status.textContent=msg||'';status.classList.toggle('show',!!msg)}
   function positionImage(detail){
     if(!image||!currentBounds||!detail)return;
@@ -257,8 +262,8 @@ react/cjs/react-jsx-runtime.production.js:
   }
   function makeUrl(detail){
     var v=detail.view;
-    var west=rdX(v.x), east=rdX(v.x+v.w);
-    var north=rdY(v.y), south=rdY(v.y+v.h);
+    var west=utmX(v.x), east=utmX(v.x+v.w);
+    var north=utmY(v.y), south=utmY(v.y+v.h);
     var dispW=Math.max(1,v.w*detail.scale), dispH=Math.max(1,v.h*detail.scale);
     var mult=window.innerWidth<=930?1.35:1.2;
     // Preserve the geographic bbox aspect ratio exactly.
@@ -274,7 +279,7 @@ react/cjs/react-jsx-runtime.production.js:
       LAYERS:'Actueel_orthoHR',
       STYLES:'',
       FORMAT:'image/jpeg',
-      CRS:'EPSG:28992',
+      CRS:'EPSG:25831',
       WIDTH:String(w),
       HEIGHT:String(h),
       BBOX:[west,south,east,north].map(function(n){return n.toFixed(2)}).join(',')
