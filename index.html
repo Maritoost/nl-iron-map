@@ -79,13 +79,15 @@ button{touch-action:manipulation}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.tags span{padding:5px 8px;border-radius:999px;background:#edf2ef;color:#4f696b;font-size:12px;font-weight:700}.tags .insitu{background:#dceff2;color:#07566b}
 .hero{margin-top:20px;background:var(--ink);color:#fff;border-radius:11px;padding:17px 19px;box-shadow:0 12px 28px #1730361f}.hero span{display:block;color:#bdcccd;font-size:12px}.hero b{display:block;color:#ffe1c9;font-size:31px;letter-spacing:-.04em;margin:4px 0}.hero small{color:#b7c6c7;font-size:11px}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.metric{min-height:86px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#fff}.metric span,.metric small{display:block;color:var(--muted);font-size:11px}.metric b{display:block;font-size:18px;margin-top:5px}
-.details section{border-top:1px solid var(--line);margin-top:23px;padding-top:20px}.details section header{display:flex;justify-content:space-between;align-items:center}.details section header small{color:var(--blue);font-size:11px}
+.details section{border-top:1px solid var(--line);margin-top:23px;padding-top:20px}.details section header{display:flex;flex-wrap:wrap;gap:7px;justify-content:space-between;align-items:center}.details section header h3{flex-shrink:0}.details section header small{color:var(--blue);font-size:11px}
 .chart{width:100%;height:auto;margin-top:10px;display:block;overflow:visible}.chart .grid{stroke:#dce4e2;stroke-width:1}.chart .line{fill:none;stroke:#b95b39;stroke-width:2}.chart .pred{fill:#cb6844}.chart .lab{fill:#fff;stroke:#0077b3;stroke-width:2}.chart text{fill:#708386;font:10px var(--mono)}
 .chartkey{display:flex;gap:14px;margin-top:7px;font-size:11px;color:var(--muted)}.chartkey span{display:flex;align-items:center;gap:5px}.chartkey i{display:inline-block;width:14px;height:2px;background:#b95b39}.chartkey span+span i{width:8px;height:8px;border:2px solid #0077b3;border-radius:50%;background:#fff}
 .chart-status{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .chart-status .est{color:#b95b39;font-weight:700}
 .chart-status .lab{color:#0077b3;font-weight:700}
 .chart-status .sep{color:var(--muted)}
+.chart{touch-action:none;cursor:crosshair;user-select:none}.chart:focus-visible{outline:2px solid #0077b3;outline-offset:3px;border-radius:4px}
+.chart .time-cursor{pointer-events:none}.chart .time-cursor line{stroke:#263e42;stroke-width:1.5;stroke-dasharray:4 3}.chart .time-cursor rect{fill:#263e42}.chart .time-cursor text{fill:#fff;font-size:10px}.chart circle.active{stroke-width:2.5;filter:drop-shadow(0 1px 2px #ffffff)}.chart .pred.active{stroke:#71351f}.chart-readout{font-size:11px;color:var(--muted);line-height:1.5;margin:8px 0 0;min-height:33px;overflow-wrap:anywhere}
 .kv{margin-top:8px}.kv div{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;padding:8px 0;border-bottom:1px solid #e3e8e6;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-weight:650}
 .empty{margin-top:11px;border:1px dashed #cad6d3;border-radius:8px;padding:28px 10px;text-align:center;color:var(--muted);font-size:13px}
 .science-note{margin-top:17px;padding:13px 14px;background:#eef7fb;border-left:4px solid var(--blue);border-radius:0 8px 8px 0;color:#294950;font-size:13px;line-height:1.5}
@@ -158,14 +160,14 @@ button{touch-action:manipulation}
           <button data-layer="winter"><i></i>Winter</button>
           <button data-layer="spring"><i></i>Spring</button>
           <button data-layer="autumn"><i></i>Autumn</button>
-          <button data-layer="hotspot"><i></i>Hotspots</button>
+          <button data-layer="hotspot"><i></i>Above P90</button>
           <button data-layer="support"><i></i>Coverage</button>
-          <button data-layer="peak"><i></i>Peak week</button>
+          <button data-layer="peak"><i></i>Peak timing</button>
         </div>
         <div class="legend">
           <div class="legend-row"><b id="legendName">Long-term median</b><span id="legendUnit">mg L⁻¹</span></div>
           <div class="legend-bar" id="legendBar"></div>
-          <div class="legend-ticks" id="legendTicks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+          <div class="legend-ticks" id="legendTicks"><span>≤0.3</span><span>≥3</span></div>
         </div>
       </section>
 
@@ -178,7 +180,7 @@ button{touch-action:manipulation}
 
       <section>
         <div class="controlhead"><b>In situ coverage</b></div>
-        <button class="toggle" id="insituToggle"><i></i><span><b>Highlight in situ segments</b><small id="insituCount">Off</small></span></button>
+        <button class="toggle" id="insituToggle"><i></i><span><b>Highlight in situ segments</b><small id="insituCount">Loading…</small></span></button>
       </section>
 
       <button class="about-btn" id="aboutBtn"><b>About this product</b><span>Model domain, uncertainty and sources →</span></button>
@@ -191,13 +193,13 @@ button{touch-action:manipulation}
 
       <div class="toolbar">
         <div class="map-actions">
-          <div class="basemap-control"><span>Background</span><div class="basemap-buttons"><button id="plainBtn" class="active">Plain</button><button id="satBtn">Satellite</button></div></div>
+          <div class="basemap-control"><span>Background</span><div class="basemap-buttons"><button id="plainBtn" class="active">Plain</button><button id="satBtn">Aerial</button></div></div>
           <div class="zoom-controls"><button id="zoomIn">+</button><button id="zoomOut">−</button></div>
           <button id="resetBtn">Reset Netherlands</button>
         </div>
       </div>
 
-      <div class="stats"><div><b>1.68</b><span>median mg L⁻¹</span></div><div><b>3.34</b><span>P90 reference</span></div><div><b>129</b><span>median dates</span></div></div>
+      <div class="stats" id="nationalStats"><div><b>…</b><span>Loading current release</span></div></div>
       <div class="scale"><div class="bar" id="scaleBar"></div><span id="scaleLabel">20 km</span></div>
       <div class="attribution">Aerial imagery: PDOK / Beeldmateriaal · CC BY 4.0</div>
       <div class="load-status" id="loadStatus"></div>
@@ -215,15 +217,20 @@ const canvas=$("#mapCanvas"), ctx=canvas.getContext("2d"), panel=$("#mapPanel"),
 const satBase=$("#satBase"), tileLayer=$("#tileLayer"), loadStatus=$("#loadStatus"), tooltip=$("#tooltip");
 
 const LAYERS={
- median:{key:"fe_mean_median",name:"Long-term median",unit:"mg L⁻¹",min:0,max:5,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["0","1","2","3","4","5"]},
- winter:{key:"season_DJF_4c",name:"Winter median",unit:"mg L⁻¹",min:0,max:5,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["0","1","2","3","4","5"]},
- spring:{key:"season_MAM_4c",name:"Spring median",unit:"mg L⁻¹",min:0,max:5,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["0","1","2","3","4","5"]},
- autumn:{key:"season_SON_4c",name:"Autumn median",unit:"mg L⁻¹",min:0,max:5,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["0","1","2","3","4","5"]},
- hotspot:{key:"hotspot_frequency_pct_4c",name:"Hotspot frequency",unit:"% dates",min:0,max:50,palette:["#f4eadc","#efc08c","#df8458","#bd513a","#7f2930","#42192a"],ticks:["0","10","20","30","40","50"]},
- support:{key:"valid_count_median",name:"Median segment coverage",unit:"valid pixels",min:20,max:250,palette:["#e1eef2","#b8d9df","#72b2be","#2d8192","#155267","#0a3447"],ticks:["20","66","112","158","204","250"]},
- peak:{key:"peak_week_4c",name:"Peak week",unit:"ISO week",min:4,max:35,palette:["#385e96","#5c77ad","#8b84bd","#bc8fb5","#d6998f","#d3ad64"],ticks:["W39","W45","W51","W5","W11","W18"]}
+ median:{key:"fe_median_mg_l",name:"Long-term median",unit:"mg L⁻¹",min:0.3,max:3,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["≤0.3","0.84","1.38","1.92","2.46","≥3"]},
+ winter:{key:"winter_fe_mg_l",name:"Winter median",unit:"mg L⁻¹",min:0.3,max:3,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["≤0.3","0.84","1.38","1.92","2.46","≥3"]},
+ spring:{key:"spring_fe_mg_l",name:"Spring median",unit:"mg L⁻¹",min:0.3,max:3,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["≤0.3","0.84","1.38","1.92","2.46","≥3"]},
+ autumn:{key:"autumn_fe_mg_l",name:"Autumn median",unit:"mg L⁻¹",min:0.3,max:3,palette:["#d7eef4","#73bfd0","#f0cf7d","#e78345","#a52e27","#511821"],ticks:["≤0.3","0.84","1.38","1.92","2.46","≥3"]},
+ hotspot:{key:"exceedance_frequency_pct",name:"Frequency above national P90",unit:"% dates",min:0,max:60,palette:["#f4eadc","#efc08c","#df8458","#bd513a","#7f2930","#42192a"],ticks:["0","12","24","36","48","≥60"]},
+ support:{key:"acquisition_count",name:"Accepted acquisition dates",unit:"dates",min:21,max:362,palette:["#e1eef2","#b8d9df","#72b2be","#2d8192","#155267","#0a3447"],ticks:["21","89","157","226","294","362"]},
+ peak:{key:"peak_week",name:"Median annual peak timing",unit:"Fe-year week",min:1,max:40,palette:["#385e96","#5c77ad","#8b84bd","#bc8fb5","#d6998f","#d3ad64"],ticks:["1","9","17","24","32","40"]}
 };
-const LKEY={fe_mean_median:0,season_DJF_4c:1,season_MAM_4c:2,season_SON_4c:3,hotspot_frequency_pct_4c:4,valid_count_median:5,peak_week_4c:6};
+const DATA_REVISION="v70-full-836d058d5dcb";
+let product=null;
+const dataURL=path=>`./data/${path}?v=${DATA_REVISION}`;
+async function dataJSON(path){const r=await fetch(dataURL(path));if(!r.ok)throw Error(`${path}: ${r.status}`);const d=await r.json();if(d.revision!==DATA_REVISION)throw Error(`Mixed releases: ${path}`);return d;}
+const count=v=>Number(v).toLocaleString("en-GB");
+const LKEY={fe_median_mg_l:0,winter_fe_mg_l:1,spring_fe_mg_l:2,autumn_fe_mg_l:3,exceedance_frequency_pct:4,acquisition_count:5,peak_week:6};
 
 let state={
   layer:"median",soil:"All",insitu:false,satellite:false,selected:null,hover:null,
@@ -235,17 +242,7 @@ let view={cx:0,cy:0,upp:500,drag:null,pointers:new Map(),pinch:null}, cssW=1,css
 const WORLD=20037508.342789244, DESKTOP_POLY_UPP=180, MOBILE_POLY_UPP=120, DETAIL_UPP=28;
 
 function decodeMeta(d){
-  return d.segments.map(a=>({
-    id:a[0],cx:a[1],cy:a[2],b:[a[3],a[4],a[5],a[6]],
-    m:{
-      display_name:a[7],naamnl:a[7],naamoffici:a[7],krw:a[8],
-      soil_final:a[9],primary_soil:a[9],has_in_situ:!!a[10],
-      fe_mean_median:a[11],season_DJF_4c:a[12],season_MAM_4c:a[13],
-      season_SON_4c:a[14],hotspot_frequency_pct_4c:a[15],
-      valid_count_median:a[16],peak_week_4c:a[17],
-      width_medi:a[18],width_max:a[19]
-    }
-  }))
+  return d.segments.map(row=>{const m=Object.fromEntries(d.fields.map((k,i)=>[k,row[i]]));return {id:m.segment_id,cx:m.x_merc,cy:m.y_merc,b:m.bounds,m};});
 }
 function rgb(hex){hex=hex.replace("#","");return [parseInt(hex.slice(0,2),16),parseInt(hex.slice(2,4),16),parseInt(hex.slice(4,6),16)]}
 function colour(layer,value){
@@ -255,10 +252,10 @@ function colour(layer,value){
 }
 function filtered(s){
   if(state.soil!=="All"){
-    const aliases={Peat:"veen",Sand:"zand",Clay:"klei"};
-    const wanted=(aliases[state.soil]||state.soil).toLowerCase();
-    const x=(s.m.soil_final||s.m.primary_soil||"").toLowerCase();
-    if(!x.includes(wanted))return false;
+    const aliases={veen:"peat",zand:"sand",klei:"clay"};
+    const wanted=state.soil.toLowerCase();
+    const raw=(s.m.soil_class||"").toLowerCase();
+    if((aliases[raw]||raw)!==wanted)return false;
   }
   return true
 }
@@ -309,19 +306,19 @@ function buildCoarsePaths(){
   batch()
 }
 function maybeLoadCoarse(){
-  if(state.coarseLoading||state.coarse||!state.segments.length)return;
+  if(product?.geometry_mode!=="polygons"||state.coarseLoading||state.coarse||!state.segments.length)return;
   const threshold=window.innerWidth<=930?MOBILE_POLY_UPP:DESKTOP_POLY_UPP;
   if(view.upp>threshold*1.35&&state.selected==null)return;
   state.coarseLoading=true;
-  fetch("./data/segments-coarse-delta.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
-    .then(g=>{state.coarse=g;buildCoarsePaths()}).catch(console.error).finally(()=>state.coarseLoading=false)
+  dataJSON("segments-coarse-delta.json")
+    .then(g=>{state.coarse=g.rings;buildCoarsePaths()}).catch(console.error).finally(()=>state.coarseLoading=false)
 }
 function maybeLoadDetail(){
-  if(state.detailLoading||state.detail||!state.segments.length)return;
+  if(product?.geometry_mode!=="polygons"||state.detailLoading||state.detail||!state.segments.length)return;
   if(view.upp>DETAIL_UPP&&state.selected==null)return;
   state.detailLoading=true;showStatus("Loading detailed water geometry…");
-  fetch("./data/segments-detail-delta.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()})
-    .then(g=>{state.detail=g;requestDraw()}).catch(console.error).finally(()=>{state.detailLoading=false;showStatus("")})
+  dataJSON("segments-detail-delta.json")
+    .then(g=>{state.detail=g.rings;requestDraw()}).catch(console.error).finally(()=>{state.detailLoading=false;showStatus("")})
 }
 function detailPath(i){
   if(!state.detail)return null;
@@ -347,7 +344,7 @@ function draw(){
     const rad=Math.max(2.8,Math.min(5.2,3.7*Math.sqrt(420/Math.max(view.upp,70))));
     for(let i=0;i<state.segments.length;i++){
       const s=state.segments[i];if(!filtered(s)||s.cx<vb[0]||s.cx>vb[2]||s.cy<vb[1]||s.cy>vb[3])continue;
-      ctx.beginPath();ctx.arc(sx(s.cx),sy(s.cy),rad,0,Math.PI*2);ctx.fillStyle=colour(state.layer,+s.m[LAYERS[state.layer].key]);ctx.fill();
+      ctx.beginPath();ctx.arc(sx(s.cx),sy(s.cy),rad,0,Math.PI*2);ctx.fillStyle=colour(state.layer,s.m[LAYERS[state.layer].key]);ctx.fill();
       if(state.insitu&&s.m.has_in_situ){ctx.strokeStyle="#10292f";ctx.lineWidth=1.1;ctx.stroke()}
     }
   }else{
@@ -357,7 +354,7 @@ function draw(){
     for(let i=0;i<state.segments.length;i++){
       const s=state.segments[i];if(!filtered(s))continue;const b=s.b;if(b[2]<vb[0]||b[0]>vb[2]||b[3]<vb[1]||b[1]>vb[3])continue;
       const p=detailed?detailPath(i):state.coarsePaths[i];if(!p)continue;
-      ctx.fillStyle=colour(state.layer,+s.m[LAYERS[state.layer].key]);ctx.fill(p,"evenodd");
+      ctx.fillStyle=colour(state.layer,s.m[LAYERS[state.layer].key]);ctx.fill(p,"evenodd");
       if(state.insitu&&s.m.has_in_situ){ctx.strokeStyle="#10292f";ctx.lineWidth=1.15*view.upp;ctx.stroke(p)}
     }
     if(state.selected!=null){
@@ -375,7 +372,7 @@ function pointInRingDelta(x,y,r){
   if(!r||r.length<4)return false;let pts=[],px=r[0],py=r[1];pts.push(px,py);for(let k=2;k<r.length;k+=2){px+=r[k];py+=r[k+1];pts.push(px,py)}
   let c=false;for(let i=0,j=pts.length-2;i<pts.length;j=i,i+=2){const xi=pts[i],yi=pts[i+1],xj=pts[j],yj=pts[j+1];if(((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c
 }
-function pointInGeomDelta(x,y,rings){if(!rings||!rings.length||!pointInRingDelta(x,y,rings[0]))return false;for(let i=1;i<rings.length;i++)if(pointInRingDelta(x,y,rings[i]))return false;return true}
+function pointInGeomDelta(x,y,rings){let inside=false;for(const ring of rings||[])if(pointInRingDelta(x,y,ring))inside=!inside;return inside;}
 function hitTest(px,py){
   const x=wx(px),y=wy(py),thr=12*view.upp;
   if(usePolygons()){
@@ -397,10 +394,10 @@ function isoWeekOfDate(dt){
 }
 function peakCalendar(v){
   if(v==null||!Number.isFinite(+v))return null;
-  // peak_week_4c is the median annual peak week within the Sep–May Fe-year.
+  // peak_week is the median annual peak week within the Sep–May Fe-year.
   // Convert its seasonal position to the midpoint of the corresponding week
-  // in a representative Sep 2024–May 2025 Fe-year for calendar display.
-  const start=Date.UTC(2024,8,1);
+  // in the manuscript's Sep 2019–May 2020 reference calendar.
+  const start=Date.UTC(2019,8,1);
   const dt=new Date(start+(+v-.5)*7*86400000);
   return {
     week:isoWeekOfDate(dt),
@@ -411,46 +408,98 @@ function peakTimingLabel(v){
   const p=peakCalendar(v);
   return p?`≈ ISO week ${p.week} · ${p.month}`:"—";
 }
+function geometryNote(){return "";}
 function renderInitial(){
-  details.innerHTML=`<p class="eyebrow">National overview</p><h2>Select a water segment</h2>
-  <div class="metrics"><div class="metric"><span>WFD segments</span><b>7,820</b><small>eligible inland waters</small></div><div class="metric"><span>Segment dates</span><b>1,066,757</b><small>657 acquisition dates</small></div><div class="metric"><span>National median</span><b>1.68 mg L⁻¹</b><small>September–May</small></div><div class="metric"><span>Median segment coverage</span><b>129 dates</b><small>individual segments: 21–304 dates</small></div></div>
-  <div class="science-note"><b>Interpretation</b><br>Total Fe includes multiple dissolved, colloidal and particulate iron forms. The map shows empirical estimates based on reflectance and environmental context.</div>
-  <div class="contact"><b>Comments or questions?</b><br><a href="mailto:m.van.oostende@vu.nl">m.van.oostende@vu.nl</a></div>`
+  $("#nationalStats").innerHTML=`<div><b>${fmt(product.median_fe)}</b><span>median mg L⁻¹</span></div><div><b>${fmt(product.p90)}</b><span>P90 reference</span></div><div><b>${count(product.median_dates)}</b><span>median dates</span></div>`;
+  details.innerHTML=`<p class="eyebrow">National overview · WP1 v70</p><h2>Select a water segment</h2>
+  <div class="metrics"><div class="metric"><span>WFD segments</span><b>${count(product.segments)}</b><small>eligible inland waters</small></div><div class="metric"><span>Segment dates</span><b>${count(product.segment_dates)}</b><small>${count(product.dates)} acquisition dates</small></div><div class="metric"><span>Median of segment medians</span><b>${fmt(product.median_fe)} mg L⁻¹</b><small>September–May</small></div><div class="metric"><span>Median acquisition count</span><b>${count(product.median_dates)} dates</b><small>individual segments: ${product.min_dates}–${product.max_dates} dates</small></div></div>
+  
+  <div class="science-note"><b>Interpretation</b><br>Empirical estimates of total Fe, including dissolved, colloidal and particulate forms. High concentrations are underestimated on average. The P90 reference is a relative mapping threshold, not a water-quality standard.</div>
+  <button class="about-btn" style="display:block" onclick="openAbout()"><b>About this product</b><span>Model, uncertainty and sources →</span></button>
+  <div class="contact"><b>Comments or questions?</b><br><a href="mailto:m.van.oostende@vu.nl">m.van.oostende@vu.nl</a></div>`;
 }
 async function renderDetails(s){
-  const m=s.m,soil=m.soil_final||m.primary_soil||"Unknown";
+  const m=s.m,soil=m.soil_class||"Unknown";
   details.innerHTML=`<p class="eyebrow">Water segment</p><h2>${escapeHtml(m.display_name||m.naamnl||m.naamoffici||("Segment "+s.id))}</h2>
   <div class="tags"><span>${escapeHtml(m.krw||"WFD type unknown")}</span><span>${escapeHtml(soil)}</span>${m.has_in_situ?'<span class="insitu">In situ coverage</span>':""}</div>
-  <div class="hero"><span>Long-term median estimated total Fe</span><b>${fmt(m.fe_mean_median,2)} <small>mg L⁻¹</small></b><small>September–May</small></div>
-  <div class="metrics"><div class="metric"><span>Winter</span><b>${fmt(m.season_DJF_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Spring</span><b>${fmt(m.season_MAM_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Autumn</span><b>${fmt(m.season_SON_4c,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Hotspot frequency</span><b>${fmt(m.hotspot_frequency_pct_4c,1)}%</b><small>P90 = 3.34 mg L⁻¹</small></div></div>
+  <div class="hero"><span>Long-term median estimated total Fe</span><b>${fmt(m.fe_median_mg_l,2)} <small>mg L⁻¹</small></b><small>September–May; median weighted by valid-pixel counts</small></div>
+  
+  <div class="metrics"><div class="metric"><span>Winter</span><b>${fmt(m.winter_fe_mg_l,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Spring</span><b>${fmt(m.spring_fe_mg_l,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Autumn</span><b>${fmt(m.autumn_fe_mg_l,2)}</b><small>mg L⁻¹</small></div><div class="metric"><span>Frequency above P90</span><b>${fmt(m.exceedance_frequency_pct,1)}%</b><small>P90 = ${fmt(product.p90)} mg L⁻¹</small></div></div>
   <section><header><h3>Time series</h3><small id="chartStatus" class="chart-status">Loading…</small></header><div id="chartWrap" class="empty">Loading segment time series…</div></section>
-  <section><header><h3>Segment context</h3></header><dl class="kv"><div><dt>WFD type</dt><dd>${escapeHtml(m.krw||"—")}</dd></div><div><dt>Median width</dt><dd>${fmt(m.width_medi,1)} m</dd></div><div><dt>Maximum width</dt><dd>${fmt(m.width_max,1)} m</dd></div><div><dt>Soil association</dt><dd>${escapeHtml(soil)}</dd></div><div><dt>Peak timing</dt><dd>${peakTimingLabel(m.peak_week_4c)}</dd></div><div><dt>Median valid pixels</dt><dd>${fmt(m.valid_count_median,0)}</dd></div></dl></section>`;
+  <section><header><h3>Segment context</h3></header><dl class="kv"><div><dt>WFD type</dt><dd>${escapeHtml(m.krw||"—")}</dd></div><div><dt>Median shoreline distance</dt><dd>${fmt(m.width_medi,1)} m</dd></div><div><dt>Maximum shoreline distance</dt><dd>${fmt(m.width_max,1)} m</dd></div><div><dt>Soil association</dt><dd>${escapeHtml(soil)}</dd></div><div><dt>Peak timing</dt><dd>${peakTimingLabel(m.peak_week)}</dd></div><div><dt>Accepted dates</dt><dd>${fmt(m.acquisition_count,0)}</dd></div><div><dt>Median valid pixels</dt><dd>${fmt(m.median_valid_pixels,1)}</dd></div><div><dt>Median valid-area fraction</dt><dd>${fmt(100*m.median_valid_fraction,1)}%</dd></div></dl></section>`;
   loadChart(s.id)
 }
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+const seriesCache=new Map();
+async function cachedSeries(path){
+ if(!seriesCache.has(path))seriesCache.set(path,dataJSON(path).catch(e=>{seriesCache.delete(path);throw e}));
+ return seriesCache.get(path);
+}
 async function loadChart(id){
-  const shard=String(id%64).padStart(2,"0");let pred=[],lab=[];
-  try{const [a,b]=await Promise.all([fetch(`./data/timelines/${shard}.json`).then(r=>r.json()),fetch(`./data/lab/${shard}.json`).then(r=>r.json())]);pred=a[String(id)]||[];lab=b[String(id)]||[]}catch(e){console.error(e)}
-  const wrap=$("#chartWrap"),status=$("#chartStatus");if(!wrap)return;
-  if(status){
-    const est=`<span class="est">${pred.length} estimated date${pred.length===1?"":"s"}</span>`;
-    const ins=lab.length?`<span class="sep">·</span><span class="lab">${lab.length} in situ observation${lab.length===1?"":"s"}</span>`:"";
-    status.innerHTML=est+ins;
+  const shard=String(id%64).padStart(2,"0");
+  try{
+    const [data,field]=await Promise.all([cachedSeries(`timelines/${shard}.json`),cachedSeries(`lab/${shard}.json`)]);
+    if(state.segments[state.selected]?.id!==id)return;
+    const pred=data.series[String(id)]||[],lab=field.series[String(id)]||[],wrap=$("#chartWrap"),status=$("#chartStatus");
+    if(!wrap)return;
+    if(status)status.innerHTML=`<span class="est">${count(pred.length)} estimated dates</span>${lab.length?`<span class="sep">·</span><span class="lab">${count(lab.length)} field observations</span>`:""}`;
+    if(!pred.length&&!lab.length){wrap.className="empty";wrap.textContent="No data for this segment.";return;}
+    const sites=new Set(lab.map(d=>d[2])).size;
+    const note=lab.length?`Field observations: ${sites} monitoring site${sites===1?"":"s"}, all months. These are point samples; satellite estimates are segment medians. Hover over observations for date, site and value.`:"No field observations could be linked unambiguously to this segment.";
+    wrap.className="";wrap.innerHTML=chartSVG(pred,lab)+`<p style="font-size:11px;color:var(--muted);line-height:1.5">September–May estimates in mg L⁻¹. Lines are omitted across gaps longer than 45 days. ${note}</p>`;
+    bindChartCursor(wrap,pred,lab);
+  }catch(e){
+    console.error(e);if(state.segments[state.selected]?.id!==id)return;
+    const wrap=$("#chartWrap");if(wrap){wrap.className="empty";wrap.textContent="Time series could not be loaded. Please refresh or try again.";}
+    const status=$("#chartStatus");if(status)status.textContent="Load error";
   }
-  if(!pred.length&&!lab.length){wrap.className="empty";wrap.textContent="No time-series data available for this segment.";return}
-  wrap.className="";wrap.innerHTML=chartSVG(pred,lab)
 }
 function chartSVG(pred,lab){
   const all=[...pred.map(d=>[d[0],d[1]]),...lab.map(d=>[d[0],d[1]])];let xmin=Math.min(...all.map(d=>d[0])),xmax=Math.max(...all.map(d=>d[0]));if(xmax===xmin)xmax=xmin+1;let ymax=Math.max(1,...all.map(d=>d[1]));ymax=Math.min(Math.max(1.2,ymax*1.08),Math.max(5,ymax*1.08));
-  const W=350,H=185,L=40,R=10,T=10,B=30,x=d=>L+(d-xmin)/(xmax-xmin)*(W-L-R),y=v=>T+(1-v/ymax)*(H-T-B);
-  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}">`;for(let k=0;k<=4;k++){let yy=T+k*(H-T-B)/4;s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}"/><text x="${L-7}" y="${yy+3}" text-anchor="end">${(ymax*(1-k/4)).toFixed(1)}</text>`}
-  if(pred.length){let pts=pred.map(d=>`${x(d[0]).toFixed(1)},${y(d[1]).toFixed(1)}`).join(" ");s+=`<polyline class="line" points="${pts}"/>`;for(const d of pred)s+=`<circle class="pred" cx="${x(d[0])}" cy="${y(d[1])}" r="2"/>`}
-  for(const d of lab)s+=`<circle class="lab" cx="${x(d[0])}" cy="${y(d[1])}" r="3.5"/>`;
+  const W=350,H=207,L=40,R=10,T=32,B=30,x=d=>L+(d-xmin)/(xmax-xmin)*(W-L-R),y=v=>T+(1-v/ymax)*(H-T-B);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" data-min="${xmin}" data-max="${xmax}" tabindex="0" role="slider" aria-label="Timeline date. Click or drag; arrow keys move between observation dates." aria-valuemin="${xmin}" aria-valuemax="${xmax}" aria-valuenow="${xmin}" aria-valuetext="No date selected">`;for(let k=0;k<=4;k++){let yy=T+k*(H-T-B)/4;s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}"/><text x="${L-7}" y="${yy+3}" text-anchor="end">${(ymax*(1-k/4)).toFixed(1)}</text>`}
+  if(pred.length){let path="";for(let i=0;i<pred.length;i++){const d=pred[i],cmd=i===0||d[0]-pred[i-1][0]>45?"M":"L";path+=`${cmd}${x(d[0]).toFixed(1)},${y(d[1]).toFixed(1)} `;}s+=`<path class="line" d="${path}"/>`;for(const d of pred){const date=new Date(Date.UTC(2015,0,1)+d[0]*86400000).toISOString().slice(0,10);s+=`<circle class="pred" cx="${x(d[0])}" cy="${y(d[1])}" r="2"><title>${date}: ${fmt(d[1],3)} mg L⁻¹; ${d[2]} valid pixels</title></circle>`;}}
+  for(const d of lab){const date=new Date(Date.UTC(2015,0,1)+d[0]*86400000).toISOString().slice(0,10);s+=`<circle class="lab" cx="${x(d[0])}" cy="${y(d[1])}" r="3.5"><title>${escapeHtml(d[2])} · ${date}: ${escapeHtml(d[3])}${fmt(d[1],3)} mg L⁻¹ · ${escapeHtml(d[4])}</title></circle>`;}
   const epoch=new Date(Date.UTC(2015,0,1));for(let yr=2016;yr<=2025;yr+=3){let day=(Date.UTC(yr,0,1)-epoch.getTime())/86400000;if(day>=xmin&&day<=xmax)s+=`<text x="${x(day)}" y="${H-8}" text-anchor="middle">${yr}</text>`}
   let key=`<div class="chartkey"><span><i></i>Estimated total Fe</span>`;
   if(lab.length)key+=`<span><i></i>In situ Fe</span>`;
   key+=`</div>`;
-  s+=`</svg>${key}`;return s
+  s+=`<g class="time-cursor" style="display:none"><line y1="${T-3}" y2="${H-B}"/><rect y="3" width="84" height="21" rx="4"/><text y="17" text-anchor="middle"></text></g></svg>${key}<p class="chart-readout">Click or drag the timeline to select a date. Nearby observations enlarge. Arrow keys step through observation dates.</p>`;return s
+}
+function bindChartCursor(wrap,pred,lab){
+  const svg=wrap.querySelector('.chart'),cursor=svg.querySelector('.time-cursor'),line=cursor.querySelector('line'),badge=cursor.querySelector('rect'),label=cursor.querySelector('text'),readout=wrap.querySelector('.chart-readout');
+  const min=Number(svg.dataset.min),max=Number(svg.dataset.max),left=40,right=340;
+  const points=[...svg.querySelectorAll('circle.pred')].map((el,i)=>({el,day:pred[i][0],base:2,radius:5})).concat([...svg.querySelectorAll('circle.lab')].map((el,i)=>({el,day:lab[i][0],base:3.5,radius:6.5})));
+  const days=[...new Set(points.map(p=>p.day))].sort((a,b)=>a-b),x=day=>left+(day-min)/(max-min)*(right-left);
+  let selected=null,dragging=null;
+  function select(day){
+    selected=Math.max(min,Math.min(max,day));const px=x(selected),date=new Date(Date.UTC(2015,0,1)+selected*86400000).toISOString().slice(0,10);
+    cursor.style.display='';line.setAttribute('x1',px);line.setAttribute('x2',px);
+    const badgeX=Math.max(0,Math.min(350-84,px-42));badge.setAttribute('x',badgeX);label.setAttribute('x',badgeX+42);label.textContent=date;
+    for(const p of points){const active=p.day===selected;p.el.classList.toggle('active',active);p.el.setAttribute('r',active?p.radius:p.base);if(active)svg.insertBefore(p.el,cursor)}
+    svg.setAttribute('aria-valuenow',selected);svg.setAttribute('aria-valuetext',date);
+    const estimates=pred.filter(d=>d[0]===selected),observations=lab.filter(d=>d[0]===selected);
+    const values=[...estimates.map(d=>`Satellite: ${fmt(d[1],3)} mg L⁻¹`),...observations.map(d=>`In situ (${d[2]}): ${d[3]||''}${fmt(d[1],3)} mg L⁻¹`)];
+    readout.textContent=date+' · '+(values.length?values.join(' · '):'No observations on this date.');
+  }
+  function fromPointer(e){
+    const matrix=svg.getScreenCTM();if(!matrix)return;
+    const point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;
+    const px=Math.max(left,Math.min(right,point.matrixTransform(matrix.inverse()).x));
+    const nearest=days.reduce((best,day)=>Math.abs(x(day)-px)<Math.abs(x(best)-px)?day:best,days[0]);
+    // Snap within six screen pixels; otherwise show the date under the cursor.
+    select(Math.abs(x(nearest)-px)*Math.hypot(matrix.a,matrix.b)<=6?nearest:Math.round(min+(px-left)/(right-left)*(max-min)));
+  }
+  svg.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;e.preventDefault();dragging=e.pointerId;svg.focus({preventScroll:true});svg.setPointerCapture(e.pointerId);fromPointer(e)});
+  svg.addEventListener('pointermove',e=>{if(e.pointerId===dragging)fromPointer(e)});
+  const end=e=>{if(e.pointerId!==dragging)return;dragging=null;if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId)};
+  svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);svg.addEventListener('lostpointercapture',()=>{dragging=null});
+  svg.addEventListener('keydown',e=>{
+    let day;if(e.key==='Home')day=days[0];else if(e.key==='End')day=days[days.length-1];
+    else if(e.key==='ArrowRight'||e.key==='ArrowUp')day=selected===null?days[0]:(days.find(d=>d>selected)??days[days.length-1]);
+    else if(e.key==='ArrowLeft'||e.key==='ArrowDown')day=selected===null?days[days.length-1]:([...days].reverse().find(d=>d<selected)??days[0]);else return;
+    e.preventDefault();select(day);
+  });
 }
 function updateLegend(){
   const d=LAYERS[state.layer];$("#legendName").textContent=d.name;$("#legendUnit").textContent=d.unit;
@@ -464,12 +513,12 @@ function updateLegend(){
       note.style.cssText="margin-top:5px;color:#687b7d;font-size:10px;line-height:1.3";
       document.querySelector(".legend").appendChild(note);
     }
-    note.textContent="Approximate ISO week for the multi-year median peak timing.";
+    note.textContent="Week 1 starts on 1 September. Grey: insufficient peak-timing support. Segment details show approximate calendar timing.";
     note.hidden=false;
   }else if(note)note.hidden=true;
 }
 function updateScale(){
-  const targets=[.1,.2,.5,1,2,5,10,20,50,100,200];const kmpp=view.upp/1000;let target=20;for(const t of targets){if(t/kmpp<=110)target=t}
+  const targets=[.1,.2,.5,1,2,5,10,20,50,100,200];const latitude=2*Math.atan(Math.exp(view.cy/6378137))-Math.PI/2;const kmpp=view.upp*Math.cos(latitude)/1000;let target=20;for(const t of targets){if(t/kmpp<=110)target=t}
   const px=Math.max(24,Math.min(115,target/kmpp));$("#scaleBar").style.width=px+"px";$("#scaleLabel").textContent=(target<1?target.toFixed(1):target)+" km"
 }
 function zoomLevel(){return Math.max(6,Math.min(19,Math.round(Math.log2(156543.03392804097/view.upp))))}
@@ -502,15 +551,15 @@ function showTooltip(i,e){
   if(i<0){tooltip.hidden=true;return}
   const s=state.segments[i],m=s.m;
   const value=state.layer==="peak"
-    ?peakTimingLabel(m.peak_week_4c)
+    ?peakTimingLabel(m.peak_week)
     :`${fmt(m[LAYERS[state.layer].key],state.layer==="hotspot"?1:2)} ${LAYERS[state.layer].unit}`;
-  tooltip.innerHTML=`<b>${escapeHtml(m.display_name||m.naamnl||m.naamoffici||("Segment "+s.id))}</b><span>${escapeHtml(m.krw||"")} · ${escapeHtml(m.soil_final||m.primary_soil||"")}</span><strong>${value}</strong>`;
+  tooltip.innerHTML=`<b>${escapeHtml(m.display_name||m.naamnl||m.naamoffici||("Segment "+s.id))}</b><span>${escapeHtml(m.krw||"")} · ${escapeHtml(m.soil_class||"")}</span><strong>${value}</strong>`;
   tooltip.hidden=false;
   tooltip.style.left=Math.min(innerWidth-245,e.clientX+14)+"px";
   tooltip.style.top=Math.min(innerHeight-95,e.clientY+14)+"px"
 }
 function search(q){
-  q=q.trim().toLowerCase();if(!q)return[];const scored=[];for(let i=0;i<state.segments.length;i++){const s=state.segments[i],m=s.m,name=(m.display_name||"").toLowerCase(),krw=(m.krw||"").toLowerCase(),id=String(s.id);let sc=0;if(name===q)sc=100;else if(name.startsWith(q))sc=80;else if(name.includes(q))sc=60;else if(krw===q)sc=50;else if(id===q)sc=100;else if(id.includes(q))sc=30;if(sc)scored.push([sc,i])}return scored.sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1])
+  q=q.trim().toLowerCase();if(!q)return[];const scored=[];for(let i=0;i<state.segments.length;i++){const s=state.segments[i],m=s.m,name=(m.display_name||"").toLowerCase(),krw=(m.krw||"").toLowerCase(),id=String(s.id);let sc=0;if(id===q||name===q)sc=100;else if(name.startsWith(q))sc=80;else if(name.includes(q))sc=60;else if(krw===q)sc=50;else if(id===q)sc=100;else if(id.includes(q))sc=30;if(sc)scored.push([sc,i])}return scored.sort((a,b)=>b[0]-a[0]).slice(0,8).map(x=>x[1])
 }
 
 canvas.addEventListener("wheel",e=>{
@@ -609,99 +658,58 @@ document.addEventListener("click",e=>{if(!e.target.closest(".search"))res.hidden
 
 $("#aboutBtn").onclick=()=>openAbout();
 function openAbout(){
-  const d=document.createElement("div");
-  d.className="modal-backdrop";
-  d.innerHTML=`<div class="modal">
-    <button class="close" aria-label="Close">×</button>
-    <p class="eyebrow">About this product</p>
-    <h2>Data, model domain and uncertainty</h2>
-    <p class="about-lead">Empirical Sentinel-2 estimates of total Fe for eligible Dutch inland WFD freshwater segments, summarised by segment and accepted acquisition date.</p>
-
-    <div class="science-note">
-      <b>How to interpret this product</b><br>
-      Total Fe includes multiple dissolved, colloidal and particulate iron forms. The map shows empirical estimates based on Sentinel-2 reflectance and environmental context.
-    </div>
-
-    <div class="about-stats">
-      <div class="about-stat"><span>WFD segments</span><b>7,820</b><small>mapped domain</small></div>
-      <div class="about-stat"><span>Predictions</span><b>1,066,757</b><small>segment dates</small></div>
-      <div class="about-stat"><span>Satellite dates</span><b>657</b><small>2015–2025</small></div>
-      <div class="about-stat"><span>Field records</span><b>12,494</b><small>458 locations</small></div>
-    </div>
-
-    <div class="about-grid">
-      <section>
-        <p class="eyebrow">Model domain</p>
-        <h3>Inclusion criteria</h3>
-        <dl class="about-list">
-          <div><dt>Target</dt><dd>Total Fe, mg L⁻¹</dd></div>
-          <div><dt>Water domain</dt><dd>Dutch inland freshwater WFD segments</dd></div>
-          <div><dt>Width</dt><dd>Widest point ≥10 m; median up to 400 m; maximum up to 800 m</dd></div>
-          <div><dt>Excluded waters</dt><dd>Non-fresh, brackish, saline, coastal and tidal WFD types</dd></div>
-          <div><dt>Soil context</dt><dd>Peat, sand or clay</dd></div>
-          <div><dt>Period</dt><dd>2015–2025; September–May only</dd></div>
-          <div><dt>Satellite</dt><dd>Sentinel-2 MSI; 10 m input imagery</dd></div>
-          <div><dt>Modelling set</dt><dd>775 matchups from 151 monitoring locations</dd></div>
-          <div><dt>Temporal match</dt><dd>Same day or ±1 day</dd></div>
-          <div><dt>Model</dt><dd>XGBoost regression on log1p(total Fe)</dd></div>
-        </dl>
-      </section>
-
-      <section>
-        <p class="eyebrow">Model configuration</p>
-        <h3>Context + spectral information</h3>
-        <div class="model-strip">
-          <p><b>Context:</b> water-body width, seven-day precipitation, time of year and relative elevation.</p>
-          <p><b>Spectral:</b> green–red absorption/attenuation descriptors, visible-to-SWIR spectral shape, NIR–SWIR contrast and B6 red-edge reflectance.</p>
-          <p><b>Evaluation:</b> nested 5-fold cross-validation grouped by monitoring location.</p>
-        </div>
-
-        <p class="eyebrow" style="margin-top:18px">Transferability</p>
-        <h3>Performance beyond the calibration observations</h3>
-        <ul class="transfer-list">
-          <li><b>New monitoring locations:</b> R² 0.676, RMSE 0.663 mg L⁻¹</li>
-          <li><b>New 25 × 25 km areas:</b> R² 0.569, RMSE 0.764 mg L⁻¹</li>
-          <li><b>Later years (2021–2025):</b> R² 0.682, RMSE 0.632 mg L⁻¹</li>
-        </ul>
-        <p></p>
-      </section>
-    </div>
-
-    <section class="sources-block">
-      <p class="eyebrow">Sources</p>
-      <h3>Primary datasets and map services</h3>
-      <div class="source-links">
-        <a href="https://documentation.dataspace.copernicus.eu/Data/SentinelMissions/Sentinel2.html" target="_blank" rel="noopener noreferrer"><span>Sentinel-2 MSI imagery</span><b>Copernicus Data Space Ecosystem ↗</b></a>
-        <a href="https://www.waterkwaliteitsportaal.nl/download-data" target="_blank" rel="noopener noreferrer"><span>Total-Fe monitoring data</span><b>Water Quality Portal ↗</b></a>
-        <a href="https://www.waterkwaliteitsportaal.nl/krw-geo-informatie" target="_blank" rel="noopener noreferrer"><span>WFD water bodies and types</span><b>Water Quality Portal / PDOK ↗</b></a>
-        <a href="https://dataplatform.knmi.nl/dataset/rd1-5" target="_blank" rel="noopener noreferrer"><span>Seven-day precipitation</span><b>KNMI gridded daily precipitation (Rd1) ↗</b></a>
-        <a href="https://www.ahn.nl/dataroom" target="_blank" rel="noopener noreferrer"><span>Terrain height</span><b>Actueel Hoogtebestand Nederland (AHN3 DTM) ↗</b></a>
-        <a href="https://www.pdok.nl/introductie/-/article/bro-bodemkaart-sgm-" target="_blank" rel="noopener noreferrer"><span>Soil association</span><b>BRO Soil Map via PDOK ↗</b></a>
-        <a href="https://www.pdok.nl/introductie/-/article/pdok-luchtfoto-rgb-open-" target="_blank" rel="noopener noreferrer"><span>Optional aerial background</span><b>PDOK / Beeldmateriaal ↗</b></a>
-      </div>
-
-      <p class="eyebrow" style="margin-top:20px">Method references</p>
-      <div class="method-links">
-        <a href="https://github.com/acolite/acolite" target="_blank" rel="noopener noreferrer"><span>Atmospheric correction</span><b>ACOLITE / Dark Spectrum Fitting ↗</b></a>
-        <a href="https://doi.org/10.1364/AO.41.005755" target="_blank" rel="noopener noreferrer"><span>Absorption / attenuation descriptors</span><b>Lee et al. (2002), Quasi-Analytical Algorithm ↗</b></a>
-      </div>
-
-      
-    </section>
-
-    <div class="contact"><b>Comments or questions?</b><br><a href="mailto:m.van.oostende@vu.nl">m.van.oostende@vu.nl</a> · Ocean Optics XXVII, Poster #234</div>
-  </div>`;
-
-  document.body.appendChild(d);
-  d.querySelector(".close").onclick=()=>d.remove();
-  d.onclick=e=>{if(e.target===d)d.remove()};
+ const d=document.createElement("div");d.className="modal-backdrop";
+ const p=product,f=p.fixed_performance,n=p.nested_performance;
+ d.innerHTML=`<div class="modal"><button class="close" aria-label="Close">×</button>
+ <p class="eyebrow">${escapeHtml(p.release)}</p><h2>Data, model domain and uncertainty</h2>
+ <p>Empirical estimates of total Fe for Dutch non-tidal inland freshwaters, September–May, 2015–2025.</p>
+ 
+ <div class="about-stats"><div class="about-stat"><span>WFD segments</span><b>${count(p.segments)}</b></div><div class="about-stat"><span>Segment-date estimates</span><b>${count(p.segment_dates)}</b></div><div class="about-stat"><span>Acquisition dates</span><b>${count(p.dates)}</b></div><div class="about-stat"><span>Model matchups</span><b>${p.matchups}</b><small>${p.locations} monitoring locations</small></div></div>
+ <div class="about-grid"><section><h3>Model domain</h3><dl class="about-list">
+ <div><dt>Target</dt><dd>Total Fe, mg L⁻¹</dd></div>
+ <div><dt>Water</dt><dd>Non-tidal inland WFD freshwaters associated with peat, sand or clay</dd></div>
+ <div><dt>Shoreline distance</dt><dd>Median ≤200 m; maximum 5–400 m</dd></div>
+ <div><dt>Satellite input</dt><dd>Sentinel-2 MSI; ACOLITE DSF surface reflectance; common 10 m grid</dd></div>
+ <div><dt>Resolution</dt><dd>Resampling does not increase the native resolution of coarser bands</dd></div>
+ <div><dt>Matching</dt><dd>Acquisitions within ±1 day of field sampling</dd></div>
+ <div><dt>Mapping support</dt><dd>At least 21 accepted dates per segment; at least 10% valid area per date</dd></div>
+ <div><dt>Accepted dates</dt><dd>${p.first_date} to ${p.last_date}; no June–August estimates</dd></div>
+ </dl></section>
+ <section><h3>Seven-predictor model</h3><div class="model-strip">
+ <p><b>Context:</b> median shoreline distance and seven-day antecedent precipitation.</p>
+ <p><b>Spectral:</b> B5 reflectance, green–red–NIR curvature, B4–B7 log difference, B3–B4 normalised difference and B8–B11 normalised difference.</p>
+ <p><b>Model:</b> XGBoost fitted on ln(1 + total Fe); mapping uses all 775 matchups.</p></div>
+ <h3 style="margin-top:20px">Evaluation</h3>
+ <p><b>Primary nested evaluation:</b> R² ${fmt(n.r2)}, RMSE ${fmt(n.rmse)} mg L⁻¹ and MAE ${fmt(n.mae)} mg L⁻¹. Five folds with complete locations withheld; predictor selection and tuning repeated within training folds.</p>
+ <p><b>Fixed-configuration comparisons:</b> predictors and settings selected using the full dataset, then held fixed. These are developmental comparisons.</p>
+ <ul><li>Location-grouped: R² ${fmt(f.location.r2)}, RMSE ${fmt(f.location.rmse)} mg L⁻¹</li>
+ <li>25 × 25 km spatial blocks: R² ${fmt(f.spatial.r2)}, RMSE ${fmt(f.spatial.rmse)} mg L⁻¹</li>
+ <li>Forward years 2021–2025: R² ${fmt(f.forward.r2)}, RMSE ${fmt(f.forward.rmse)} mg L⁻¹ (${f.forward.n} test records)</li></ul></section></div>
+ <section class="sources-block"><h3>Map layers and interpretation</h3>
+ <p>Each date value is the median of valid pixel estimates in a segment. Long-term and seasonal medians are lower weighted medians of date estimates, weighted by valid-pixel counts. The national median is the unweighted median of the ${count(p.segments)} long-term segment medians.</p>
+ <p>Above-P90 frequency is the percentage of accepted dates strictly above ${fmt(p.p90,5)} mg L⁻¹, the national 90th percentile of all accepted segment-date estimates. This is a relative threshold, not an environmental quality standard. Colour scales are clipped at their labelled endpoints; original values are retained.</p>
+ <p>Peak timing is the median annual peak week across at least five eligible Fe-years. Eligible years have at least ten sampled weeks, two in each season and a span of at least 20 weeks. Boundary Fe-years 2016 and 2026 are excluded. ${count(p.peak_segments)} segments have supported peak timing; missing values are grey.</p>
+ <p>Total Fe includes dissolved, colloidal and particulate forms. These empirical estimates do not separately retrieve those forms. High concentrations are underestimated on average; high estimated values require field confirmation. Coverage varies between segments and dates.</p>
+ <p><b>Field observations:</b> ${count(p.lab_records)} site-date observations from ${count(p.lab_sites)} monitoring locations are linked to ${count(p.lab_segments)} mapped segments.</p><p>${escapeHtml(p.lab_note)}</p></section>
+ <section class="sources-block"><h3>Sources</h3><div class="source-links">
+ <a href="https://documentation.dataspace.copernicus.eu/Data/SentinelMissions/Sentinel2.html" target="_blank" rel="noopener noreferrer"><span>Sentinel-2 imagery</span><b>Copernicus Data Space ↗</b></a>
+ <a href="https://www.waterkwaliteitsportaal.nl/download-data" target="_blank" rel="noopener noreferrer"><span>Field total Fe</span><b>Waterkwaliteitsportaal ↗</b></a>
+ <a href="https://www.pdok.nl/introductie/-/article/krw-oppervlaktewaterlichamen-inspire-geharmoniseerd-" target="_blank" rel="noopener noreferrer"><span>KRW water geometry</span><b>Informatiehuis Water / PDOK ↗</b></a>
+ <a href="https://daggegevens.knmi.nl/klimatologie/monv/reeksen" target="_blank" rel="noopener noreferrer"><span>Daily precipitation stations</span><b>KNMI ↗</b></a>
+ <a href="https://www.pdok.nl/introductie/-/article/bro-bodemkaart-sgm-" target="_blank" rel="noopener noreferrer"><span>Soil association</span><b>BRO / PDOK ↗</b></a>
+ <a href="https://github.com/acolite/acolite" target="_blank" rel="noopener noreferrer"><span>Atmospheric correction</span><b>ACOLITE DSF ↗</b></a>
+ <a href="https://www.pdok.nl/introductie/-/article/pdok-luchtfoto-rgb-open-" target="_blank" rel="noopener noreferrer"><span>Optional aerial background</span><b>PDOK / Beeldmateriaal ↗</b></a></div></section>
+ <div class="contact"><a href="mailto:m.van.oostende@vu.nl">m.van.oostende@vu.nl</a></div></div>`;
+ document.body.appendChild(d);d.querySelector(".close").onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove()};
 }
 
-fetch("./data/segments-fast.json").then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(d=>{
-  state.segments=decodeMeta(d);state.bounds=d.bounds;renderInitial();updateLegend();resize();fitBounds(state.bounds);
-  const n=state.segments.filter(s=>s.m.has_in_situ).length;$("#insituCount").textContent=`Off · ${n} segments`;
-  setTimeout(maybeLoadCoarse,30);
-}).catch(e=>{console.error(e);details.innerHTML=`<div class="empty">Map data could not be loaded. Please refresh the page.</div>`});
+Promise.all([dataJSON("product.json"),dataJSON("segments-fast.json")]).then(([p,d])=>{
+  product=p;state.segments=decodeMeta(d);state.bounds=d.bounds;
+  if(state.segments.length!==product.segments)throw Error("Segment count mismatch");
+  renderInitial();updateLegend();resize();fitBounds(state.bounds);
+  $("#insituCount").textContent=`Off · ${count(product.lab_segments)} segments`;
+  if(product.geometry_mode==="polygons")setTimeout(maybeLoadCoarse,30);
+}).catch(e=>{console.error(e);details.innerHTML=`<div class="empty">Current map data could not be loaded. Please refresh the page. If this persists, check that the complete release was uploaded.</div>`;});
 
 addEventListener("resize",resize);
 </script>
